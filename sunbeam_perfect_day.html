@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunbeam — Perfect Day Egg Timer</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:Arial, sans-serif; color:#49351f;
+    background:linear-gradient(#fff8dc 0%,#ffe8a8 48%,#b9e4dc 100%);
+    overflow-x:hidden;
+  }
+  .sun{position:fixed;width:230px;height:230px;border-radius:50%;background:#ffd35c;
+    top:-80px;right:-45px;box-shadow:0 0 80px #ffd35c;opacity:.8;z-index:-1}
+  .cloud{position:fixed;font-size:70px;opacity:.35;z-index:-1;animation:float 12s ease-in-out infinite}
+  .c1{top:90px;left:5%}.c2{top:230px;right:5%;animation-delay:3s}
+  @keyframes float{50%{transform:translateX(25px)}}
+  header{padding:28px 7%;display:flex;justify-content:space-between;align-items:center}
+  .brand{font-weight:900;letter-spacing:3px}.brand span{color:#e9a72d}
+  .badge{background:#fff8;border:1px solid #fff;padding:9px 14px;border-radius:99px;font-size:13px}
+  main{max-width:1050px;margin:auto;padding:30px 20px 55px}
+  .hero{text-align:center}
+  .eyebrow{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#9b6822}
+  h1{font-size:clamp(42px,8vw,78px);line-height:.95;margin:12px 0}
+  h1 span{color:#e7a62d}
+  .hero p{font-size:18px;max-width:600px;margin:0 auto 28px;line-height:1.6}
+  .app{display:grid;grid-template-columns:1fr 1.25fr;gap:22px;align-items:stretch}
+  .card{background:#fffaf0dd;border:1px solid #ffffffaa;border-radius:30px;padding:25px;box-shadow:0 18px 50px #7e5d2618;backdrop-filter:blur(8px)}
+  .choices{display:grid;gap:10px}
+  .egg-choice{border:2px solid transparent;background:#fff;padding:14px;border-radius:18px;
+    text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:#49351f}
+  .egg-choice:hover,.egg-choice.active{border-color:#f0b83d;background:#fff5cf}
+  .egg-icon{font-size:30px;margin-right:10px}.choice-title{font-weight:800}.choice-time{color:#9b784b;font-size:13px}
+  .timer-card{text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .egg{font-size:105px;line-height:1;margin:5px 0;filter:drop-shadow(0 10px 8px #805b231f);transition:.3s}
+  .egg.cooking{animation:bob 1s infinite ease-in-out}
+  @keyframes bob{50%{transform:translateY(-9px) rotate(2deg)}}
+  .ring{width:245px;height:245px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;
+    background:conic-gradient(#e9a72d var(--progress,0%),#f4e7c6 0);
+    position:relative}
+  .ring:before{content:"";position:absolute;width:215px;height:215px;border-radius:50%;background:#fffaf0}
+  .time{position:relative;font-size:52px;font-weight:900;letter-spacing:2px}
+  .status{min-height:25px;color:#8c7049;margin-bottom:18px}
+  button{border:0;border-radius:99px;padding:14px 22px;font-size:16px;font-weight:800;cursor:pointer}
+  .start{background:#e9a72d;color:white;box-shadow:0 8px 20px #d79b2c55}.reset{background:#f2e6c9;color:#674b2a;margin-left:7px}
+  .tip{margin-top:18px;font-size:13px;color:#876d49}
+  .day{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .day h2{margin:0 0 8px}.day p{line-height:1.55;color:#725d40}
+  .moods{display:flex;gap:8px;flex-wrap:wrap}.mood{background:#fff;border:1px solid #ead9b7;padding:9px 12px;border-radius:99px;cursor:pointer}
+  .mood.selected{background:#fce6a8;border-color:#e9a72d}
+  .quote{font-style:italic;font-size:18px}
+  .toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,120px);background:#49351f;color:white;
+    padding:13px 20px;border-radius:99px;transition:.35s;z-index:10}.toast.show{transform:translate(-50%,0)}
+  footer{text-align:center;font-size:12px;color:#806a4b;padding:15px}
+  @media(max-width:760px){.app,.day{grid-template-columns:1fr}header{padding:22px}.app{gap:14px}.ring{width:220px;height:220px}.ring:before{width:192px;height:192px}.time{font-size:46px}}
+</style>
+</head>
+<body>
+<div class="sun"></div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div>
+
+<header>
+  <div class="brand">☀ <span>SUNBEAM</span></div>
+  <div class="badge">✦ a tiny kitchen helper</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">slow morning • good energy • perfect egg</div>
+    <h1>Perfect egg,<br><span>perfect day.</span></h1>
+    <p>Pick your yolk mood, press start, and let Sunbeam keep watch while you enjoy the little things.</p>
+  </section>
+
+  <section class="app">
+    <div class="card">
+      <h2>🥚 Pick your yolk mood</h2>
+      <div class="choices">
+        <button class="egg-choice active" data-time="240" data-name="Runny">
+          <span><span class="egg-icon">🥚</span><span class="choice-title">Runny</span></span><span class="choice-time">04:00</span>
+        </button>
+        <button class="egg-choice" data-time="360" data-name="Silky soft">
+          <span><span class="egg-icon">🥚</span><span class="choice-title">Silky soft</span></span><span class="choice-time">06:00</span>
+        </button>
+        <button class="egg-choice" data-time="480" data-name="Jammy">
+          <span><span class="egg-icon">🥚</span><span class="choice-title">Jammy</span></span><span class="choice-time">08:00</span>
+        </button>
+        <button class="egg-choice" data-time="660" data-name="Golden">
+          <span><span class="egg-icon">🥚</span><span class="choice-title">Golden</span></span><span class="choice-time">11:00</span>
+        </button>
+      </div>
+      <div class="tip">☀ Tip: keep an eye on the timer and use normal kitchen safety when cooking.</div>
+    </div>
+
+    <div class="card timer-card">
+      <div class="egg" id="egg">🥚</div>
+      <div class="ring" id="ring"><div class="time" id="time">04:00</div></div>
+      <div class="status" id="status">Runny yolk selected</div>
+      <div>
+        <button class="start" id="start">▶ Start timer</button>
+        <button class="reset" id="reset">↺ Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="day">
+    <div class="card">
+      <h2>🌤️ How's your day feeling?</h2>
+      <p>Choose a little mood before breakfast. No pressure — just a tiny moment for yourself.</p>
+      <div class="moods">
+        <button class="mood">☀️ Sunny</button><button class="mood">🌿 Calm</button>
+        <button class="mood">⚡ Energised</button><button class="mood">🌈 Hopeful</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>💛 Today's little reminder</h2>
+      <p class="quote" id="quote">“A good day can start with something wonderfully simple.”</p>
+      <button class="reset" id="newQuote">New reminder ✨</button>
+    </div>
+  </section>
+</main>
+<footer>Made for slow mornings, sunny thoughts & perfectly timed eggs ☀️</footer>
+<div class="toast" id="toast">🍳 Breakfast is ready! Have a beautiful day.</div>
+
+<script>
+let selectedTime=240, remaining=240, interval=null, running=false;
+const timeEl=document.getElementById('time'), ring=document.getElementById('ring'),
+statusEl=document.getElementById('status'), egg=document.getElementById('egg'), toast=document.getElementById('toast');
+
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function update(){
+  timeEl.textContent=fmt(remaining);
+  let pct=((selectedTime-remaining)/selectedTime)*100;
+  ring.style.setProperty('--progress',pct+'%');
+}
+document.querySelectorAll('.egg-choice').forEach(b=>b.onclick=()=>{
+  clearInterval(interval); running=false;
+  selectedTime=remaining=Number(b.dataset.time);
+  document.querySelectorAll('.egg-choice').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  statusEl.textContent=b.dataset.name+' yolk selected'; egg.classList.remove('cooking');
+  document.getElementById('start').textContent='▶ Start timer'; update();
+});
+document.getElementById('start').onclick=()=>{
+  if(running){clearInterval(interval);running=false;document.getElementById('start').textContent='▶ Resume';egg.classList.remove('cooking');return}
+  if(remaining<=0) remaining=selectedTime;
+  running=true; egg.classList.add('cooking'); document.getElementById('start').textContent='Ⅱ Pause';
+  interval=setInterval(()=>{
+    remaining--; update();
+    if(remaining<=0){
+      clearInterval(interval);running=false;egg.classList.remove('cooking');
+      document.getElementById('start').textContent='▶ Start again';
+      statusEl.textContent='Perfect! Your egg is ready ✨';
+      toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),4500);
+      document.title='🍳 Ready! — Sunbeam';
+    }
+  },1000);
+};
+document.getElementById('reset').onclick=()=>{
+  clearInterval(interval);running=false;remaining=selectedTime;egg.classList.remove('cooking');
+  document.getElementById('start').textContent='▶ Start timer'; statusEl.textContent='Ready when you are ☀️';
+  update(); document.title='Sunbeam — Perfect Day Egg Timer';
+};
+document.querySelectorAll('.mood').forEach(m=>m.onclick=()=>{
+  document.querySelectorAll('.mood').forEach(x=>x.classList.remove('selected'));m.classList.add('selected');
+  statusEl.textContent=m.textContent+' day energy ✨';
+});
+const quotes=[
+'“A good day can start with something wonderfully simple.”',
+'“Take your time. The morning is yours.”',
+'“Tiny rituals can make ordinary days feel special.”',
+'“Breakfast first, then whatever comes next.”'
+];
+document.getElementById('newQuote').onclick=()=>document.getElementById('quote').textContent=quotes[Math.floor(Math.random()*quotes.length)];
+update();
+</script>
+</body>
+</html>
